@@ -43,15 +43,11 @@ public class UserController {
 
     @PostMapping
     public UserResponse saveUser(@Valid @RequestBody CreateUserRequest request) {
-        UserEntity user = new UserEntity();
-        user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
-
-        return toResponse(userService.saveUser(user));
+        return toResponse(userService.saveUser(request));
     }
 
     @PutMapping("/{id}")
-    public UserResponse updateUser(@Valid @RequestBody UpdateUserRequest request, @PathVariable("id") Long id) {
+    public UserResponse updateUser(@PathVariable("id") Long id, @Valid @RequestBody UpdateUserRequest request) {
         return toResponse(userService.updateUser(id, request.getEmail()));
     }
 
@@ -62,7 +58,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/password")
-    public UserResponse updatePassword(@Valid @PathVariable Long id, @RequestBody UpdatePasswordRequest request) {
+    public UserResponse updatePassword(@PathVariable Long id, @Valid @RequestBody UpdatePasswordRequest request) {
 
         return toResponse(userService.updatePassword(id, request.getPassword()));
     }

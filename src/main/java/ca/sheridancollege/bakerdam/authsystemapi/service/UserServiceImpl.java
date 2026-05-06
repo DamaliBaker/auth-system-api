@@ -1,5 +1,6 @@
 package ca.sheridancollege.bakerdam.authsystemapi.service;
 
+import ca.sheridancollege.bakerdam.authsystemapi.dto.request.CreateUserRequest;
 import ca.sheridancollege.bakerdam.authsystemapi.entity.UserEntity;
 import ca.sheridancollege.bakerdam.authsystemapi.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,8 +19,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity saveUser(UserEntity user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword())); // Hash PW
+    public UserEntity saveUser(CreateUserRequest request) {
+        UserEntity user = new UserEntity();
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
         return userRepository.save(user);
     }
 
