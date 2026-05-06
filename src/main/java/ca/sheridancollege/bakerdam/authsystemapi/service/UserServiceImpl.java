@@ -35,8 +35,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity updateUser(UserEntity user) {
-        UserEntity existingUser = userRepository.findById(user.getId())
+    public UserEntity updateUser(UserEntity user, Long id) {
+        UserEntity existingUser = userRepository.findById(id)
                                         .orElseThrow(() -> new RuntimeException("User not found"));
 
         existingUser.setEmail(user.getEmail());

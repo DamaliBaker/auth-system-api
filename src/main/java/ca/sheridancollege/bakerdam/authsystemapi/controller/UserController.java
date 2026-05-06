@@ -1,13 +1,38 @@
 package ca.sheridancollege.bakerdam.authsystemapi.controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import ca.sheridancollege.bakerdam.authsystemapi.entity.UserEntity;
+import ca.sheridancollege.bakerdam.authsystemapi.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
+@RequestMapping("/users")
 public class UserController {
+    private final UserService userService;
 
-    @GetMapping("/test")
-    public String test() {
-        return "API is working";
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
+    @GetMapping
+    public List<UserEntity> getUsers() {
+        return userService.getAllUsers();
+    }
+
+    @PostMapping
+    public UserEntity saveUser(@Valid @RequestBody UserEntity user) {
+        return userService.saveUser(user);
+    }
+
+    @PutMapping("/{id}")
+    public UserEntity updateUser(@RequestBody UserEntity user, @PathVariable("id") Long id) {
+        return userService.updateUser(user, id);
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteUserById(@PathVariable("id") Long id) {
+        userService.deleteUserById(id);
+        return "Deleted successfully";
+    }
 }

@@ -9,5 +9,5 @@ public interface UserService {
     void deleteUserById(Long id);
     UserEntity findUserById(Long id);
     List<UserEntity> getAllUsers();
-    UserEntity updateUser(UserEntity user);
+    UserEntity updateUser(UserEntity user, Long id);
 }
