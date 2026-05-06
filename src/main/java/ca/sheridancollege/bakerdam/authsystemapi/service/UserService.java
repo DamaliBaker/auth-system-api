@@ -9,6 +9,6 @@ public interface UserService {
     void deleteUserById(Long id);
     UserEntity findUserById(Long id);
     List<UserEntity> getAllUsers();
-    UserEntity updateUser(UserEntity user, Long id);
+    UserEntity updateUser(Long id, String email);
     UserEntity updatePassword(Long id, String password);
 }
