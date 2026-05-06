@@ -2,6 +2,7 @@ package ca.sheridancollege.bakerdam.authsystemapi.service;
 
 import ca.sheridancollege.bakerdam.authsystemapi.entity.UserEntity;
 import ca.sheridancollege.bakerdam.authsystemapi.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,13 +10,16 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public UserEntity saveUser(UserEntity user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword())); // Hash PW
         return userRepository.save(user);
     }
 
@@ -26,7 +30,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity findUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepository.findById(id)
+                            .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @Override
@@ -35,13 +40,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity updateUser(UserEntity user, Long id) {
+    public UserEntity updateUser(UserEntity user, Long id) { // Updates email only
         UserEntity existingUser = userRepository.findById(id)
                                         .orElseThrow(() -> new RuntimeException("User not found"));
 
         existingUser.setEmail(user.getEmail());
-        existingUser.setPassword(user.getPassword());
 
         return userRepository.save(existingUser);
+    }
+
+    @Override
+    public UserEntity updatePassword(Long id, String password) {
+        UserEntity user = userRepository.findById(id)
+                                        .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(password));
+
+        return userRepository.save(user);
     }
 }
