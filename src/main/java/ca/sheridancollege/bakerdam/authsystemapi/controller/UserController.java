@@ -20,6 +20,11 @@ public class UserController {
         return userService.getAllUsers();
     }
 
+    @GetMapping("/{id}")
+    public UserEntity getUserById(@PathVariable("id") Long id) {
+        return userService.findUserById(id);
+    }
+
     @PostMapping
     public UserEntity saveUser(@Valid @RequestBody UserEntity user) {
         return userService.saveUser(user);
@@ -34,5 +39,10 @@ public class UserController {
     public String deleteUserById(@PathVariable("id") Long id) {
         userService.deleteUserById(id);
         return "Deleted successfully";
+    }
+
+    @PutMapping("/{id}/password")
+    public UserEntity updatePassword(@PathVariable Long id, @RequestBody UserEntity user) {
+        return userService.updatePassword(id, user.getPassword());
     }
 }
