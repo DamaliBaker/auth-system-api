@@ -4,6 +4,7 @@ import ca.sheridancollege.bakerdam.authsystemapi.dto.request.UpdatePasswordReque
 import ca.sheridancollege.bakerdam.authsystemapi.dto.request.UpdateUserRequest;
 import ca.sheridancollege.bakerdam.authsystemapi.dto.response.UserResponse;
 import ca.sheridancollege.bakerdam.authsystemapi.entity.UserEntity;
+import ca.sheridancollege.bakerdam.authsystemapi.mapper.UserMapper;
 import ca.sheridancollege.bakerdam.authsystemapi.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -16,13 +17,11 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final UserMapper userMapper;
 
-    private UserResponse toResponse(UserEntity user) {
-        return new UserResponse(user.getId(), user.getEmail());
-    }
-
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserMapper userMapper) {
         this.userService = userService;
+        this.userMapper = userMapper;
     }
 
     @GetMapping
@@ -31,7 +30,7 @@ public class UserController {
         List<UserResponse> response = new ArrayList<>();
 
         for (UserEntity user : users) {
-            response.add(toResponse(user));
+            response.add(userMapper.toResponse(user));
         }
 
         return response;
@@ -39,18 +38,18 @@ public class UserController {
 
     @GetMapping("/{id}")
     public UserResponse getUserById(@PathVariable("id") Long id) {
-        return toResponse(userService.findUserById(id));
+        return userMapper.toResponse(userService.findUserById(id));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse saveUser(@Valid @RequestBody CreateUserRequest request) {
-        return toResponse(userService.saveUser(request));
+        return userMapper.toResponse(userService.saveUser(request));
     }
 
     @PutMapping("/{id}")
     public UserResponse updateUser(@PathVariable("id") Long id, @Valid @RequestBody UpdateUserRequest request) {
-        return toResponse(userService.updateUser(id, request.getEmail()));
+        return userMapper.toResponse(userService.updateUser(id, request.getEmail()));
     }
 
     @DeleteMapping("/{id}")
@@ -61,8 +60,7 @@ public class UserController {
 
     @PutMapping("/{id}/password")
     public UserResponse updatePassword(@PathVariable Long id, @Valid @RequestBody UpdatePasswordRequest request) {
-
-        return toResponse(userService.updatePassword(id, request.getPassword()));
+        return userMapper.toResponse(userService.updatePassword(id, request.getPassword()));
     }
 
 }
