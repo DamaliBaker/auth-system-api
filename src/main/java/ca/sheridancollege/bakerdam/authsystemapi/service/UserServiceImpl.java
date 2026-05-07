@@ -2,6 +2,7 @@ package ca.sheridancollege.bakerdam.authsystemapi.service;
 
 import ca.sheridancollege.bakerdam.authsystemapi.dto.request.CreateUserRequest;
 import ca.sheridancollege.bakerdam.authsystemapi.entity.UserEntity;
+import ca.sheridancollege.bakerdam.authsystemapi.exception.UserNotFoundException;
 import ca.sheridancollege.bakerdam.authsystemapi.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,13 +30,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException(id);
+        }
+
         userRepository.deleteById(id);
     }
 
     @Override
     public UserEntity findUserById(Long id) {
         return userRepository.findById(id)
-                            .orElseThrow(() -> new RuntimeException("User not found"));
+                            .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     @Override
@@ -46,7 +51,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserEntity updateUser(Long id, String email) { // Updates email only
         UserEntity existingUser = userRepository.findById(id)
-                                        .orElseThrow(() -> new RuntimeException("User not found"));
+                                        .orElseThrow(() -> new UserNotFoundException(id));
         existingUser.setEmail(email);
 
         return userRepository.save(existingUser);
@@ -55,7 +60,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserEntity updatePassword(Long id, String password) {
         UserEntity user = userRepository.findById(id)
-                                        .orElseThrow(() -> new RuntimeException("User not found"));
+                                        .orElseThrow(() -> new UserNotFoundException(id));
 
         user.setPassword(passwordEncoder.encode(password));
 

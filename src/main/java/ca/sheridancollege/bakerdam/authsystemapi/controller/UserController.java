@@ -6,6 +6,7 @@ import ca.sheridancollege.bakerdam.authsystemapi.dto.response.UserResponse;
 import ca.sheridancollege.bakerdam.authsystemapi.entity.UserEntity;
 import ca.sheridancollege.bakerdam.authsystemapi.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -52,9 +53,9 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteUserById(@PathVariable("id") Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUserById(@PathVariable("id") Long id) {
         userService.deleteUserById(id);
-        return "Deleted successfully";
     }
 
     @PutMapping("/{id}/password")
@@ -62,4 +63,5 @@ public class UserController {
 
         return toResponse(userService.updatePassword(id, request.getPassword()));
     }
+
 }
