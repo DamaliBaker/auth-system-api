@@ -43,6 +43,7 @@ public class UserController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public UserResponse saveUser(@Valid @RequestBody CreateUserRequest request) {
         return toResponse(userService.saveUser(request));
     }
