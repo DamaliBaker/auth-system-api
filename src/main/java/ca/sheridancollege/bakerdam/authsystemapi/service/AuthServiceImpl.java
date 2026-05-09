@@ -4,6 +4,7 @@ import ca.sheridancollege.bakerdam.authsystemapi.dto.response.AuthResponse;
 import ca.sheridancollege.bakerdam.authsystemapi.entity.UserEntity;
 import ca.sheridancollege.bakerdam.authsystemapi.exception.InvalidCredentialsException;
 import ca.sheridancollege.bakerdam.authsystemapi.repository.UserRepository;
+import ca.sheridancollege.bakerdam.authsystemapi.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +12,14 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(UserRepository userRepository,
+                           PasswordEncoder passwordEncoder,
+                           JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     @Override
@@ -23,7 +28,7 @@ public class AuthServiceImpl implements AuthService {
                                         .orElseThrow(InvalidCredentialsException::new);
 
         if (passwordEncoder.matches(password, user.getPassword())) {
-            return new AuthResponse("success");
+            return new AuthResponse(jwtService.generateToken(user.getEmail()));
         }
 
         throw new InvalidCredentialsException();
