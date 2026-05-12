@@ -63,4 +63,9 @@ public class UserController {
         return userMapper.toResponse(userService.updatePassword(id, request.getPassword()));
     }
 
+    @GetMapping("/me")
+    public UserResponse getCurrentUser() {
+        return userMapper.toResponse(userService.getCurrentUser());
+    }
+
 }

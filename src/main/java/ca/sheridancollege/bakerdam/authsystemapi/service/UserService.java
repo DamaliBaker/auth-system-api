@@ -12,4 +12,5 @@ public interface UserService {
     List<UserEntity> getAllUsers();
     UserEntity updateUser(Long id, String email);
     UserEntity updatePassword(Long id, String password);
+    UserEntity getCurrentUser();
 }
