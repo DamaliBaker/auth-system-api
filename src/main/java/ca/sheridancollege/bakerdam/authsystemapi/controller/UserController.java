@@ -24,22 +24,22 @@ public class UserController {
         this.userMapper = userMapper;
     }
 
-    @GetMapping
-    public List<UserResponse> getUsers() {
-        List<UserEntity> users = userService.getAllUsers();
-        List<UserResponse> response = new ArrayList<>();
+//    @GetMapping
+//    public List<UserResponse> getUsers() {
+//        List<UserEntity> users = userService.getAllUsers();
+//        List<UserResponse> response = new ArrayList<>();
+//
+//        for (UserEntity user : users) {
+//            response.add(userMapper.toResponse(user));
+//        }
+//
+//        return response;
+//    }
 
-        for (UserEntity user : users) {
-            response.add(userMapper.toResponse(user));
-        }
-
-        return response;
-    }
-
-    @GetMapping("/{id}")
-    public UserResponse getUserById(@PathVariable("id") Long id) {
-        return userMapper.toResponse(userService.findUserById(id));
-    }
+//    @GetMapping("/{id}")
+//    public UserResponse getUserById(@PathVariable("id") Long id) {
+//        return userMapper.toResponse(userService.findUserById(id));
+//    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -47,21 +47,21 @@ public class UserController {
         return userMapper.toResponse(userService.saveUser(request));
     }
 
-    @PutMapping("/{id}")
-    public UserResponse updateUser(@PathVariable("id") Long id, @Valid @RequestBody UpdateUserRequest request) {
-        return userMapper.toResponse(userService.updateUser(id, request.getEmail()));
-    }
+//    @PutMapping("/{id}")
+//    public UserResponse updateUser(@PathVariable("id") Long id, @Valid @RequestBody UpdateUserRequest request) {
+//        return userMapper.toResponse(userService.updateUser(id, request.getEmail()));
+//    }
 
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUserById(@PathVariable("id") Long id) {
-        userService.deleteUserById(id);
-    }
+//    @DeleteMapping("/{id}")
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    public void deleteUserById(@PathVariable("id") Long id) {
+//        userService.deleteUserById(id);
+//    }
 
-    @PutMapping("/{id}/password")
-    public UserResponse updatePassword(@PathVariable Long id, @Valid @RequestBody UpdatePasswordRequest request) {
-        return userMapper.toResponse(userService.updatePassword(id, request.getPassword()));
-    }
+//    @PutMapping("/{id}/password")
+//    public UserResponse updatePassword(@PathVariable Long id, @Valid @RequestBody UpdatePasswordRequest request) {
+//        return userMapper.toResponse(userService.updatePassword(id, request.getPassword()));
+//    }
 
     @GetMapping("/me")
     public UserResponse getCurrentUser() {
