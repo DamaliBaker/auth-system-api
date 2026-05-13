@@ -6,6 +6,7 @@ import ca.sheridancollege.bakerdam.authsystemapi.exception.EmailAlreadyExistsExc
 import ca.sheridancollege.bakerdam.authsystemapi.exception.InvalidCredentialsException;
 import ca.sheridancollege.bakerdam.authsystemapi.exception.UserNotFoundException;
 import ca.sheridancollege.bakerdam.authsystemapi.repository.UserRepository;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,6 +39,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(Long id) {
+
+        UserEntity currentUser = getCurrentUser();
+
+        if (!currentUser.getId().equals(id)) {
+            throw new AccessDeniedException("You can only update your own account");
+        }
+
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException(id);
         }
@@ -58,26 +66,33 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity updateUser(Long id, String email) { // Updates email only
-        UserEntity existingUser = userRepository.findById(id)
-                                        .orElseThrow(() -> new UserNotFoundException(id));
+
+        UserEntity currentUser = getCurrentUser();
+
+        if (!currentUser.getId().equals(id)) {
+            throw new AccessDeniedException("You can only update your own account");
+        }
 
         // If the user is changing their email and the email already exists
-        if (!existingUser.getEmail().equals(email) && userRepository.existsByEmail(email)) {
+        if (!currentUser.getEmail().equals(email) && userRepository.existsByEmail(email)) {
             throw new EmailAlreadyExistsException(email);
         }
-        existingUser.setEmail(email);
+        currentUser.setEmail(email);
 
-        return userRepository.save(existingUser);
+        return userRepository.save(currentUser);
     }
 
     @Override
     public UserEntity updatePassword(Long id, String password) {
-        UserEntity user = userRepository.findById(id)
-                                        .orElseThrow(() -> new UserNotFoundException(id));
+        UserEntity currentUser = getCurrentUser();
 
-        user.setPassword(passwordEncoder.encode(password));
+        if (!currentUser.getId().equals(id)) {
+            throw new AccessDeniedException("You can only update your own account");
+        }
 
-        return userRepository.save(user);
+        currentUser.setPassword(passwordEncoder.encode(password));
+
+        return userRepository.save(currentUser);
     }
 
     @Override
