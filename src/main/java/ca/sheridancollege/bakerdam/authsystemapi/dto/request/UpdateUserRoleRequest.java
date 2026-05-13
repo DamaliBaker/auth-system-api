@@ -1,6 +1,7 @@
-package ca.sheridancollege.bakerdam.authsystemapi.dto.response;
+package ca.sheridancollege.bakerdam.authsystemapi.dto.request;
 
 import ca.sheridancollege.bakerdam.authsystemapi.entity.enums.Role;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponse {
-    private Long id;
-    private String email;
+public class UpdateUserRoleRequest {
+    @NotNull
     private Role role;
 }

@@ -2,6 +2,7 @@ package ca.sheridancollege.bakerdam.authsystemapi.service;
 
 import ca.sheridancollege.bakerdam.authsystemapi.dto.request.CreateUserRequest;
 import ca.sheridancollege.bakerdam.authsystemapi.entity.UserEntity;
+import ca.sheridancollege.bakerdam.authsystemapi.entity.enums.Role;
 import ca.sheridancollege.bakerdam.authsystemapi.exception.EmailAlreadyExistsException;
 import ca.sheridancollege.bakerdam.authsystemapi.exception.InvalidCredentialsException;
 import ca.sheridancollege.bakerdam.authsystemapi.exception.UserNotFoundException;
@@ -11,8 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -33,66 +32,20 @@ public class UserServiceImpl implements UserService {
         UserEntity user = new UserEntity();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(Role.ROLE_USER);
 
         return userRepository.save(user);
     }
 
     @Override
-    public void deleteUserById(Long id) {
+    public void deleteCurrentUser() {
+        UserEntity user = getCurrentUser();
 
-        UserEntity currentUser = getCurrentUser();
-
-        if (!currentUser.getId().equals(id)) {
-            throw new AccessDeniedException("You can only delete your own account");
+        if (user.getRole() == Role.ROLE_ADMIN) {
+            throw new AccessDeniedException("Admin accounts cannot be deleted through self-service");
         }
 
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException(id);
-        }
-
-        userRepository.deleteById(id);
-    }
-
-    @Override
-    public UserEntity findUserById(Long id) {
-        return userRepository.findById(id)
-                            .orElseThrow(() -> new UserNotFoundException(id));
-    }
-
-    @Override
-    public List<UserEntity> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    @Override
-    public UserEntity updateUser(Long id, String email) { // Updates email only
-
-        UserEntity currentUser = getCurrentUser();
-
-        if (!currentUser.getId().equals(id)) {
-            throw new AccessDeniedException("You can only update your own account");
-        }
-
-        // If the user is changing their email and the email already exists
-        if (!currentUser.getEmail().equals(email) && userRepository.existsByEmail(email)) {
-            throw new EmailAlreadyExistsException(email);
-        }
-        currentUser.setEmail(email);
-
-        return userRepository.save(currentUser);
-    }
-
-    @Override
-    public UserEntity updatePassword(Long id, String password) {
-        UserEntity currentUser = getCurrentUser();
-
-        if (!currentUser.getId().equals(id)) {
-            throw new AccessDeniedException("You can only update your own account");
-        }
-
-        currentUser.setPassword(passwordEncoder.encode(password));
-
-        return userRepository.save(currentUser);
+        userRepository.delete(user);
     }
 
     @Override

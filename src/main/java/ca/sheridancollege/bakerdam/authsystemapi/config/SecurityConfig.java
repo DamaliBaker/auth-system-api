@@ -1,29 +1,33 @@
 package ca.sheridancollege.bakerdam.authsystemapi.config;
 
+import ca.sheridancollege.bakerdam.authsystemapi.dto.response.ErrorResponse;
 import ca.sheridancollege.bakerdam.authsystemapi.security.JwtAuthenticationFilter;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import tools.jackson.databind.ObjectMapper;
+
+import java.time.LocalDateTime;
 
 @Configuration
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final ObjectMapper objectMapper;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, ObjectMapper objectMapper) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.objectMapper = objectMapper;
     }
 
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
-
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
@@ -32,14 +36,33 @@ public class SecurityConfig {
                 .exceptionHandling(exception ->
                         exception
                                 .authenticationEntryPoint((request, response, authException) -> {
-                                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+                                    ErrorResponse error = new ErrorResponse(
+                                            LocalDateTime.now(),
+                                            HttpStatus.UNAUTHORIZED.value(),
+                                            HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                                            "Authentication is required to access this resource",
+                                            request.getRequestURI(),
+                                            null
+                                    );
+
+                                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
                                     response.setContentType("application/json");
-                                    response.getWriter().write("{\"error\":\"Unauthorized\"}");
-                        })
+                                    objectMapper.writeValue(response.getWriter(), error);
+                                })
                                 .accessDeniedHandler(((request, response, accessDeniedException) -> {
-                                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                                    ErrorResponse error = new ErrorResponse(
+                                            LocalDateTime.now(),
+                                            HttpStatus.FORBIDDEN.value(),
+                                            HttpStatus.FORBIDDEN.getReasonPhrase(),
+                                            accessDeniedException.getMessage(),
+                                            request.getRequestURI(),
+                                            null
+                                    );
+
+                                    response.setStatus(HttpStatus.FORBIDDEN.value());
                                     response.setContentType("application/json");
-                                    response.getWriter().write("{\"error\":\"Forbidden\"}");
+                                    objectMapper.writeValue(response.getWriter(), error);
                                 }))
                 )
                 .authorizeHttpRequests(auth ->
@@ -48,6 +71,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                                 .requestMatchers("/api/users/me").authenticated()
                                 .requestMatchers("/api/users/me/**").authenticated()
+                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/api/users").denyAll()
                                 .requestMatchers("/api/users/**").denyAll()
                                 .anyRequest().authenticated()
