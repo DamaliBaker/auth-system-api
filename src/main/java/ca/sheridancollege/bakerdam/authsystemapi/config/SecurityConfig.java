@@ -46,9 +46,10 @@ public class SecurityConfig {
                         auth
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/users/me").authenticated()
-                                .requestMatchers(HttpMethod.GET, "/api/users").denyAll()
-                                .requestMatchers(HttpMethod.GET, "/api/users/*").denyAll()
+                                .requestMatchers("/api/users/me").authenticated()
+                                .requestMatchers("/api/users/me/**").authenticated()
+                                .requestMatchers("/api/users").denyAll()
+                                .requestMatchers("/api/users/**").denyAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

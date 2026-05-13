@@ -68,4 +68,14 @@ public class UserController {
         return userMapper.toResponse(userService.getCurrentUser());
     }
 
+    @PutMapping("/me")
+    public UserResponse updateCurrentUser(@Valid @RequestBody UpdateUserRequest request) {
+        return userMapper.toResponse(userService.updateCurrentUser(request.getEmail()));
+    }
+
+    @PutMapping("/me/password")
+    public UserResponse updateCurrentUserPassword(@Valid @RequestBody UpdatePasswordRequest request) {
+        return userMapper.toResponse(userService.updateCurrentUserPassword(request.getPassword()));
+    }
+
 }

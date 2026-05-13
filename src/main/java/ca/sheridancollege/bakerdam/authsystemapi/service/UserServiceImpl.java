@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
         UserEntity currentUser = getCurrentUser();
 
         if (!currentUser.getId().equals(id)) {
-            throw new AccessDeniedException("You can only update your own account");
+            throw new AccessDeniedException("You can only delete your own account");
         }
 
         if (!userRepository.existsById(id)) {
@@ -109,5 +109,27 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
+    }
+
+    @Override
+    public UserEntity updateCurrentUser(String email) {
+        UserEntity user = getCurrentUser();
+
+        if (!user.getEmail().equals(email) && userRepository.existsByEmail(email)) {
+            throw new EmailAlreadyExistsException(email);
+        }
+
+        user.setEmail(email);
+
+        return userRepository.save(user);
+    }
+
+    @Override
+    public UserEntity updateCurrentUserPassword(String password) {
+        UserEntity user = getCurrentUser();
+
+        user.setPassword(passwordEncoder.encode(password));
+
+        return userRepository.save(user);
     }
 }
