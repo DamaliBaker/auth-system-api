@@ -67,13 +67,22 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth ->
                         auth
+                                .requestMatchers(
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html",
+                                        "/v3/api-docs/**"
+                                ).permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-                                .requestMatchers("/api/users/me").authenticated()
-                                .requestMatchers("/api/users/me/**").authenticated()
+                                .requestMatchers(
+                                        "/api/users/me",
+                                        "/api/users/me/**"
+                                ).authenticated()
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                                .requestMatchers("/api/users").denyAll()
-                                .requestMatchers("/api/users/**").denyAll()
+                                .requestMatchers(
+                                        "/api/users",
+                                        "/api/users/**"
+                                ).denyAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
