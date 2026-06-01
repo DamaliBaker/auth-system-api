@@ -1,0 +1,30 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: auth-system-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: auth_system_db
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: authuser
+      MYSQL_PASSWORD: authpassword
+    ports:
+        - "3307:3306"
+    volumes:
+        - mysql_data:/var/lib/mysql
+  app:
+    build: .
+    container_name: auth-system-api
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/auth_system_db
+      DB_USERNAME: authuser
+      DB_PASSWORD: authpassword
+      SECRET_KEY: change-this-to-a-long-secure-secret-key-change-before-production
+      EXPIRATION: 3600000
+    ports:
+      - "8080:8080"
+volumes:
+  mysql_data:
