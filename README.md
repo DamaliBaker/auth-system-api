@@ -5,6 +5,9 @@ A Spring Boot REST API for user authentication, JWT-based authorization,
 self-service account management, admin user management, and login brute-force
 protection.
 
+The project emphasizes secure backend development, layered architecture, 
+and containerized deployment practices commonly used in enterprise applications.
+
 This project is designed as a backend portfolio project focused on clean API design,
 layered architecture, security fundamentals, and professional REST practices.
 ---
@@ -33,8 +36,32 @@ layered architecture, security fundamentals, and professional REST practices.
 - JJWT
 - Springdoc OpenAPI / Swagger UI
 - Maven
+- Docker
+- Docker Compose
 ---
 
+## Architecture
+
+The application follows a layered architecture:
+```text
+Controller → Service → Repository → Database
+```
+
+### Layers
+
+#### Controllers
+Handle HTTP requests and responses.
+
+#### Services
+Contain business logic, validation logic, and authorization rules.
+
+#### Repositories
+Handle database access using Spring Data JPA.
+
+#### Security Components
+Handle JWT authentication, authorization filters, and request security.
+
+---
 ## Security Features
 
 ### Password Security
@@ -164,7 +191,34 @@ Validation errors include field-specific messages:
 ```
 ---
 
-## Setup Instructions
+## Running with Docker
+
+Start the application and MySQL database:
+
+```bash
+docker compose up --build
+```
+
+The API will be available at:
+```text
+http://localhost:8080
+```
+
+Swagger UI:
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+MySQL is exposed locally on port `3307`
+
+Stop containers:
+```bash
+docker compose down
+```
+
+---
+
+## Local Development Setup
 
 ### 1. Clone the Repository
 ```bash
@@ -174,7 +228,7 @@ cd auth-system-api
 ### 2. Configure the Database
 Create a MySQL database:
 ```sql
-CREATE DATABASE auth_system_api;
+CREATE DATABASE auth_system_db;
 ```
 ### 3. Configure application properties
 Create or update:
@@ -183,15 +237,15 @@ src/main/resources/application.properties
 ```
 Example
 ```text
-spring.datasource.url=jdbc:mysql://localhost:3306/auth_system_api
+spring.datasource.url=jdbc:mysql://localhost:3306/auth_system_db
 spring.datasource.username=your_mysql_username
 spring.datasource.password=your_mysql_password
 
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 
-jwt.secret=your-long-secure-secret-key-here
-jwt.expiration=3600000
+jwt.secret=${JWT_SECRET}
+jwt.expiration=${JWT_EXPIRATION}
 ```
 Do not commit real secrets to GitHub.
 
@@ -205,6 +259,7 @@ The API runs on
 ```text
 http://localhost:8080
 ```
+
 ### Creating an Admin User
 - New registered users are created with `ROLE_USER`
 - For local development, manually promote a user in the database:
@@ -256,9 +311,9 @@ JWT_EXPIRATION
 - Replace Hibernate auto-update with Flyway database migrations.
 - Add audit logs for admin actions.
 - Add a `ROLE_SUPER_ADMIN` role for managing admin accounts.
-- Add Docker Compose support for running the app with MySQL.
 - Move rate limiting to Redis or an API gateway for production scalability.
 - Add deployment configuration for cloud hosting.
+- Add GitHub Actions CI/CD pipeline.
 ---
 
 ## Status
