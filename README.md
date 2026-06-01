@@ -304,6 +304,22 @@ JWT_EXPIRATION
 ```
 ---
 
+## Screenshots
+
+### Swagger UI
+![Swagger UI](screenshots/swagger-ui.png)
+
+### Successful JWT Authentication
+![JWT Login](screenshots/login-success.png)
+
+### Authorized Swagger Session
+![Swagger Authorization](screenshots/swagger-authorization.png)
+
+### Protected Endpoint Access
+![Protected Endpoint](screenshots/protected-endpoint.png)
+
+---
+
 ## Future Improvements
 - Add integration tests for authentication and admin flows.
 - Add refresh token support for improved session management.
